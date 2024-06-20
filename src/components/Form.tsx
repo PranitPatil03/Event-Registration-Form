@@ -12,15 +12,17 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { toast } from "../components/ui/use-toast";
-import { Toaster } from "../components/ui/toaster";
+import { toast } from "./ui/use-toast";
+import { Toaster } from "./ui/toaster";
+import "../App.css";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z
   .object({
     firstName: z.string().min(4).max(10),
     lastName: z.string().min(4).max(10),
-    email: z.string().email("Invalid email"),
-    age: z.number().positive().int(),
+    email: z.string().email("Enter valid email"),
+    age: z.number().positive().int().min(1).max(120),
     guestName: z.string().optional(),
     guestType: z.enum(["Yes", "No"], {
       required_error: "Are you attending with a guest?",
@@ -31,17 +33,28 @@ const formSchema = z
     path: ["guestName"],
   });
 
-export const FormPage = () => {
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    toast({
-      title: "You submitted the following values:",
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(values, null, 2)}</code>
-        </pre>
-      ),
-    });
-  }
+export const FormContainer = () => {
+  const navigate = useNavigate();
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    if (values.guestType === "No") {
+      values.guestName = "";
+    }
+
+    if (Object.keys(form.formState.errors).length > 0) {
+      Object.values(form.formState.errors).forEach((error) => {
+        toast({
+          title: "Validation Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      });
+    } else {
+      localStorage.setItem("formData", JSON.stringify(values));
+
+      navigate("/registered");
+    }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,9 +71,6 @@ export const FormPage = () => {
   return (
     <div className="flex flex-col gap-10 items-center justify-center w-full max-w-3xl p-4 sm:p-6 md:p-8 lg:p-10 mx-auto">
       <Toaster />
-      <h2 className="font-mono text-2xl font-semibold">
-        Event Registration Form
-      </h2>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -125,6 +135,8 @@ export const FormPage = () => {
                   <FormControl>
                     <Input
                       type="number"
+                      min={1}
+                      max={120}
                       {...field}
                       onChange={(e) =>
                         field.onChange(parseInt(e.target.value, 10))
@@ -187,8 +199,11 @@ export const FormPage = () => {
               />
             )}
           </div>
-          <Button type="submit" className="mt-10 w-full">
-            Submit
+          <Button
+            type="submit"
+            className="mt-10 w-full font-mono font-bold text-lg"
+          >
+            Register
           </Button>
         </form>
       </Form>

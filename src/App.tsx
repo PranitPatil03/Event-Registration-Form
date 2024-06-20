@@ -1,13 +1,29 @@
 import "./App.css";
-import { FormPage } from "./page/Form";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import HomePage from "./page/HomePage";
+import SuccessPage from "./page/SuccessPage";
+import FormPage from "./page/FormPage";
+
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <HomePage></HomePage>,
+  },
+  {
+    path: "/form",
+    element: <FormPage></FormPage>,
+  },
+  {
+    path: "/registered",
+    element: <SuccessPage></SuccessPage>,
+  },
+]);
 
 function App() {
   return (
-    <>
-      <div className="w-full h-screen flex items-center justify-center overflow-hidden mx-0 my-auto">
-        <FormPage />
-      </div>
-    </>
+    <div className="">
+      <RouterProvider router={router} />
+    </div>
   );
 }
 
