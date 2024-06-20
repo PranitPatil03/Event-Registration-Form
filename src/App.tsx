@@ -1,10 +1,12 @@
 import "./App.css";
-import Home from "./components/Home";
+import { FormPage } from "./page/Form";
 
 function App() {
   return (
     <>
-      <Home></Home>
+      <div className="w-full h-screen flex items-center justify-center overflow-hidden mx-0 my-auto">
+        <FormPage />
+      </div>
     </>
   );
 }
